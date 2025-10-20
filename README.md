@@ -1,5 +1,10 @@
 # Agentic Multi-Modal Intelligence for Real-Time Disaster Prediction, Situational Awareness & Response
 
+📂 **Full Project Repository (Report, Code & Datasets):**  
+[Google Drive Link](https://drive.google.com/drive/folders/1Cq0rDgR0lEmzEJ2LEBNDQf0eVekFj0Vi?usp=drive_link)
+
+---
+
 MSc Data Analytics project by **Syed Arshadul Haque (UP2280648)**  
 
 This project presents an end-to-end, AI-driven pipeline that transforms raw **drone video footage** into **actionable intelligence** for real-time disaster response. The system performs scene detection, human detection, caption generation, summarization, disaster-type classification, and supports interactive Q&A.
