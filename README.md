@@ -1,130 +1,77 @@
-```markdown
 # Agentic Multi-Modal Intelligence for Real-Time Disaster Prediction, Situational Awareness & Response
 
-MSc Data Analytics project by **Syed Arshadul Haque (UP2280648)**.  
-This repo outlines an end-to-end, AI-driven pipeline that turns raw **drone video** into **actionable intelligence** for disaster response: scene/key-frame extraction → human detection → scene captioning → consolidated summarization → disaster-type classification → interactive Q&A. :contentReference[oaicite:0]{index=0}
+MSc Data Analytics project by **Syed Arshadul Haque (UP2280648)**  
+
+This project presents an end-to-end, AI-driven pipeline that transforms raw **drone video footage** into **actionable intelligence** for real-time disaster response. The system performs scene detection, human detection, caption generation, summarization, disaster-type classification, and supports interactive Q&A.
 
 ---
 
 ## ✨ Key Features
-- **Scene Detection & Key-Frames:** Extracts unique segments from raw video (PySceneDetect). :contentReference[oaicite:1]{index=1}  
-- **Human Detection (on-edge capable):** YOLOv5 / YOLOv8 (n/m/l) across key frames for rapid survivor triage. :contentReference[oaicite:2]{index=2}  
-- **Scene-wise Captioning:** Google Gemini 1.5 Flash generates rich, disaster-aware descriptions. :contentReference[oaicite:3]{index=3}  
-- **Summary Synthesis:** Consolidates frame captions into one disaster summary. :contentReference[oaicite:4]{index=4}  
-- **Disaster Classification:** RF, Decision Tree, Multinomial NB, and fine-tuned **BERT/RoBERTa** on a curated text dataset (e.g., Flood, Earthquake, Cyclone). :contentReference[oaicite:5]{index=5}  
-- **Chat Interface:** LLM-powered Q&A over the analyzed video content for fast, context-aware insight. :contentReference[oaicite:6]{index=6}
+- **Scene Detection & Key-Frame Extraction:** Detects distinct video segments using PySceneDetect.  
+- **Human Detection:** Employs YOLOv5 and YOLOv8 variants (n/m/l) for efficient survivor identification.  
+- **Scene Captioning:** Generates contextual captions with Google Gemini 1.5 Flash.  
+- **Summary Synthesis:** Merges captions into a coherent disaster narrative.  
+- **Disaster Classification:** Uses Random Forest, Decision Tree, Multinomial NB, and fine-tuned BERT / RoBERTa models to categorize events such as floods, earthquakes, or cyclones.  
+- **Interactive Chat:** Enables LLM-based conversation over analyzed results for rapid insights.
 
 ---
 
-## 🗺️ System Architecture (High Level)
-1. **Input Layer:** Drone video (H.264 recommended).  
-2. **Pre-Processing:** Scene detection → key-frame extraction.  
-3. **AI Processing:**
-   - Human detection (YOLOv5 / YOLOv8n/m/l)
-   - Frame-level captions (Gemini 1.5 Flash)
-   - Consolidated video-level summary
-   - Disaster-type classification (TF-IDF + ML; fine-tuned BERT/RoBERTa)  
-4. **Interaction Layer:** Chatbot (Gemini-powered) for operator queries. :contentReference[oaicite:7]{index=7}
+## 🗺️ System Architecture
+1. **Input Layer:** Drone video (H.264 format recommended).  
+2. **Pre-Processing:** Scene detection followed by key-frame extraction.  
+3. **AI Processing:**  
+   - Human detection via YOLO models  
+   - Frame-level captioning with Gemini 1.5 Flash  
+   - Summary generation  
+   - Disaster classification using traditional ML and fine-tuned transformers  
+4. **Interaction Layer:** Chatbot for operator Q&A and situational decision support.
 
 ---
 
-## 📊 Data
-- **Primary Source:** Public drone videos (e.g., YouTube) for scenes & frames.  
-- **Text Dataset:** Curated `(disaster_description, disaster_label)` pairs for training/testing classifiers.  
-- **Evaluation:** Accuracy/precision/recall/F1 for classifiers; qualitative checks for detection/captioning. :contentReference[oaicite:8]{index=8}
+## 📊 Data Overview
+- **Sources:** Public drone videos and curated textual datasets pairing disaster descriptions with labeled types.  
+- **Evaluation Metrics:** Accuracy, precision, recall, and F1-score for classifiers; qualitative validation for detection and captioning outputs.
 
 ---
 
-## 🧪 Models & Modules
-- **Scene Detection:** PySceneDetect.  
-- **Detectors:** YOLOv5; YOLOv8 (n/m/l) — speed/accuracy trade-offs documented.  
-- **Captioning/Summary:** Google Gemini 1.5 Flash (multimodal).  
-- **Classifiers:** RandomForest, DecisionTree, MultinomialNB, fine-tuned **BERT** & **RoBERTa**.  
-- **Chat:** Gemini-backed Q&A using scene captions + summary context. :contentReference[oaicite:9]{index=9}
+## 🧪 Models and Modules
+- **Scene Detection:** PySceneDetect  
+- **Human Detection:** YOLOv5, YOLOv8 (n/m/l)  
+- **Captioning & Summarization:** Gemini 1.5 Flash (multimodal)  
+- **Text Classification:** Random Forest, Decision Tree, Multinomial NB, BERT, and RoBERTa  
+- **Chat Interface:** Gemini-based conversational layer leveraging summary context
 
 ---
 
-## ✅ What This Solves (Why It’s Novel)
-- Integrates **video parsing + detection + captioning + summarization + classification + Q&A** into one practical pipeline for **first 72-hour** response windows.  
-- Designed for **edge deployment** on UAVs (efficiency + safety), reducing reliance on risky manned surveys. :contentReference[oaicite:10]{index=10}
+## ✅ Novel Contributions
+- Integrates multiple AI capabilities—vision, language, summarization, and dialogue—into one cohesive pipeline.  
+- Supports **edge deployment** on UAVs to minimize risk to human responders.  
+- Provides **real-time situational awareness** within the critical first 72 hours of a disaster.
 
 ---
 
-## 🚀 Quickstart (Reference)
-> Exact code paths and notebooks are referenced in the report; adapt these commands to your repo structure.
-
-1. **Prepare video**
-   ```bash
-   # Ensure H.264 for reliable processing
-   ffmpeg -i input.mp4 -vcodec libx264 -crf 18 -preset fast input_h264.mp4
-   ```
-2. **Detect scenes & extract key frames**
-   ```bash
-   python tools/scene_detect.py --video input_h264.mp4 --out frames/
-   ```
-3. **Run human detection**
-   ```bash
-   python tools/detect_yolo.py --frames frames/ --model yolov8n  # or yolov5/yolov8m/yolov8l
-   ```
-4. **Generate captions & summary (Gemini)**
-   ```bash
-   python tools/caption_and_summarize.py --frames frames/ --out summary.json
-   ```
-5. **Classify disaster type**
-   ```bash
-   python models/classify.py --summary summary.json --checkpoint checkpoints/bert_finetuned.pt
-   ```
-6. **Launch chatbot**
-   ```bash
-   python apps/chatbot.py --context summary.json
-   ```
-:contentReference[oaicite:11]{index=11}
+## 🔍 Evaluation Highlights
+- Comparative benchmarks for YOLO variants and all five classifiers (including BERT and RoBERTa).  
+- Visual analyses using accuracy charts and confusion matrices.  
+- Requirement validation, limitations, and future improvements thoroughly discussed.
 
 ---
 
-## 📁 Suggested Repo Structure
-```
-.
-├─ tools/
-│  ├─ scene_detect.py
-│  ├─ detect_yolo.py
-│  └─ caption_and_summarize.py
-├─ models/
-│  ├─ train_traditional_ml.py
-│  ├─ finetune_bert.py
-│  ├─ finetune_roberta.py
-│  └─ classify.py
-├─ apps/
-│  └─ chatbot.py
-├─ data/
-│  ├─ raw_video/
-│  ├─ frames/
-│  └─ text_dataset/
-└─ checkpoints/
-```
-:contentReference[oaicite:12]{index=12}
+## ⚖️ Ethics, Legal & Professional Aspects
+- Ethics approval secured.  
+- Adherence to GDPR and responsible AI principles.  
+- Focus on safe data handling and ethical deployment in disaster contexts.
 
 ---
 
-## 🔍 Evaluation Snapshot
-- Comparative results for YOLO variants (human detection) and five classifiers (incl. BERT/RoBERTa); bar-chart comparison and confusion-matrix analyses included in the report’s Results section.  
-- Requirements evaluation (functional & non-functional), limitations, and future work are summarized in Chapters 8–9. :contentReference[oaicite:13]{index=13}
-
----
-
-## ⚖️ Ethics, Legal & Professional
-- Ethics approval obtained; GDPR/PII awareness; responsible AI and deployment considerations documented. :contentReference[oaicite:14]{index=14}
-
----
-
-## 🛣️ Roadmap (Future Work)
-- Edge acceleration (quantization/pruning for on-drone inference)  
-- Larger/augmented multimodal datasets (incl. synthetic imagery)  
-- Active learning from field feedback; expanded disaster classes; geospatial fusion (GIS). :contentReference[oaicite:15]{index=15}
+## 🛣️ Future Roadmap
+- Model compression and quantization for edge inference.  
+- Expanded and synthetic multimodal datasets.  
+- Active learning loops and GIS integration for location-aware insights.  
 
 ---
 
 ## 📚 Citation
-If you use this work, please cite the dissertation:
-> Haque, S. A. (2025). *Agentic Multi-Modal Intelligence for Real-Time Disaster Prediction, Situational Awareness, and Response* (MSc Data Analytics). University of Portsmouth. :contentReference[oaicite:16]{index=16}
-```
+If you use this work, please cite:
+
+**Haque, S. A. (2025).** *Agentic Multi-Modal Intelligence for Real-Time Disaster Prediction, Situational Awareness and Response.* MSc Data Analytics, University of Portsmouth.
